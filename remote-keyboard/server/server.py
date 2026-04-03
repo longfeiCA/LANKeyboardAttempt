@@ -193,26 +193,6 @@ HTML_TEMPLATE = '''
             background: #c73e54;
         }
 
-        .voice-btn {
-            padding: 12px 16px;
-            background: #0f3460;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 20px;
-            cursor: pointer;
-        }
-
-        .voice-btn.recording {
-            background: #e94560;
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
         .keyboard {
             flex: 1;
             padding: 8px;
@@ -296,7 +276,6 @@ HTML_TEMPLATE = '''
     <div class="text-input-area">
         <div class="text-input-row">
             <input type="text" id="textInput" placeholder="输入文字...">
-            <button class="voice-btn" id="voiceBtn" title="语音输入">🎤</button>
             <button class="send-btn" id="sendBtn">发送</button>
         </div>
     </div>
@@ -502,46 +481,6 @@ HTML_TEMPLATE = '''
                 document.getElementById('sendBtn').click();
             }
         });
-
-        // 语音输入
-        let recognition = null;
-        const voiceBtn = document.getElementById('voiceBtn');
-
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            recognition = new SpeechRecognition();
-            recognition.lang = 'zh-CN';
-            recognition.continuous = false;
-            recognition.interimResults = false;
-
-            recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                document.getElementById('textInput').value = transcript;
-                sendText(transcript);
-            };
-
-            recognition.onerror = (event) => {
-                console.error('语音识别错误:', event.error);
-                voiceBtn.classList.remove('recording');
-            };
-
-            recognition.onend = () => {
-                voiceBtn.classList.remove('recording');
-            };
-
-            voiceBtn.addEventListener('click', () => {
-                if (recognition) {
-                    if (voiceBtn.classList.contains('recording')) {
-                        recognition.stop();
-                    } else {
-                        recognition.start();
-                        voiceBtn.classList.add('recording');
-                    }
-                }
-            });
-        } else {
-            voiceBtn.style.display = 'none';
-        }
 
         // 定期检查状态
         checkStatus();
