@@ -311,8 +311,8 @@ HTML_TEMPLATE = '''
         <textarea id="textInput" placeholder="Type here..."></textarea>
         <div class="button-row">
             <button class="key" data-key="backspace">⌫ <span id="backspaceLabel">DEL</span></button>
-            <button class="key enter" data-key="enter">↵ <span id="enterLabel">ENTER</span></button>
             <button class="send-btn" id="sendBtn">SEND</button>
+            <button class="key enter" data-key="enter">↵ <span id="enterLabel">ENTER</span></button>
         </div>
         <div class="arrow-row">
             <button class="key arrow" data-key="up">↑ <span id="upLabel">UP</span></button>
