@@ -403,12 +403,40 @@ HTML_TEMPLATE = '''
             }
         }
 
-        // 按钮点击 - 只处理 backspace 和 enter
-        document.querySelectorAll('.key').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const key = btn.dataset.key;
-                sendKey(key);
+        // 按钮点击
+        let repeatTimer = null;
+        let repeatInterval = null;
+
+        function startRepeat(key) {
+            sendKey(key);
+            repeatTimer = setTimeout(() => {
+                repeatInterval = setInterval(() => sendKey(key), 80);
+            }, 300);
+        }
+
+        function stopRepeat() {
+            clearTimeout(repeatTimer);
+            clearInterval(repeatInterval);
+            repeatTimer = null;
+            repeatInterval = null;
+        }
+
+        document.querySelectorAll('.key[data-key="backspace"], .key[data-key="up"], .key[data-key="down"]').forEach(btn => {
+            btn.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                startRepeat(btn.dataset.key);
             });
+            btn.addEventListener('pointerup', stopRepeat);
+            btn.addEventListener('pointerleave', stopRepeat);
+            btn.addEventListener('pointercancel', stopRepeat);
+        });
+
+        document.querySelectorAll('.key').forEach(btn => {
+            if (btn.dataset.key !== 'backspace' && btn.dataset.key !== 'up' && btn.dataset.key !== 'down') {
+                btn.addEventListener('click', () => {
+                    sendKey(btn.dataset.key);
+                });
+            }
         });
 
         // 文本发送
