@@ -161,11 +161,11 @@ HTML_TEMPLATE = '''
         .text-input-area {
             padding: 12px;
             background: #16213e;
-        }
-
-        .text-input-row {
             display: flex;
+            flex-direction: column;
             gap: 8px;
+            flex: 1;
+            min-height: 120px;
         }
 
         #textInput {
@@ -177,10 +177,17 @@ HTML_TEMPLATE = '''
             color: #eee;
             font-size: 16px;
             resize: none;
+            min-height: 40px;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 8px;
         }
 
         .send-btn {
-            padding: 12px 24px;
+            flex: 1;
+            padding: 14px;
             background: #e94560;
             color: white;
             border: none;
@@ -194,26 +201,26 @@ HTML_TEMPLATE = '''
         }
 
         .keyboard {
-            flex: 1;
-            padding: 8px;
+            padding: 12px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
-            overflow-y: auto;
+            gap: 8px;
+            background: #16213e;
+            border-top: 1px solid #0f3460;
         }
 
         .row {
             display: flex;
-            gap: 4px;
+            gap: 8px;
             justify-content: center;
         }
 
         .key {
-            min-width: 32px;
-            height: 48px;
+            flex: 1;
+            height: 52px;
             border: none;
-            border-radius: 6px;
-            background: #16213e;
+            border-radius: 8px;
+            background: #0f3460;
             color: #eee;
             font-size: 16px;
             cursor: pointer;
@@ -225,11 +232,7 @@ HTML_TEMPLATE = '''
 
         .key:active {
             background: #e94560;
-            transform: scale(0.95);
-        }
-
-        .key.wide {
-            min-width: 64px;
+            transform: scale(0.98);
         }
 
         .key.space {
@@ -274,19 +277,11 @@ HTML_TEMPLATE = '''
     </div>
 
     <div class="text-input-area">
-        <div class="text-input-row">
-            <input type="text" id="textInput" placeholder="输入文字...">
+        <textarea id="textInput" placeholder="输入文字..."></textarea>
+        <div class="button-row">
+            <button class="key" data-key="backspace">⌫ 删除</button>
+            <button class="key" data-key="enter">↵ 回车</button>
             <button class="send-btn" id="sendBtn">发送</button>
-        </div>
-    </div>
-
-    <div class="keyboard">
-        <!-- 简化键盘: 只保留删除、回车 -->
-        <div class="row">
-            <button class="key wide" data-key="backspace">⌫ 删除</button>
-        </div>
-        <div class="row">
-            <button class="key wide" data-key="enter">↵ 回车</button>
         </div>
     </div>
 
