@@ -32,14 +32,13 @@ A web-based virtual keyboard that lets you control your Linux machine's keyboard
 sudo apt install xdotool        # Debian/Ubuntu
 sudo dnf install xdotool        # Fedora
 
-# 2. Install Python dependency
-pip install flask
+# 2. Start the server (auto-installs Python deps if missing)
+bash start.sh
 
-# 3. Start the server
-cd src/server && python server.py
-
-# 4. Open the URL shown in terminal on your phone (same network)
+# 3. Open the URL shown in terminal on your phone (same network)
 ```
+
+> **Not on the same network?** You can use [Tailscale](https://tailscale.com) to create a virtual private network between your phone and computer, then access the server via the Tailscale IP.
 
 ### Limitations
 
@@ -77,14 +76,13 @@ This tool enables a nearly hands-free Claude Code experience. With your phone as
 sudo apt install xdotool        # Debian/Ubuntu
 sudo dnf install xdotool        # Fedora
 
-# 2. 安装 Python 依赖
-pip install flask
+# 2. 一键启动服务器（自动安装 Python 依赖）
+bash start.sh
 
-# 3. 启动服务器
-cd src/server && python server.py
-
-# 4. 用手机打开终端显示的网址（需在同一局域网）
+# 3. 用手机打开终端显示的网址（需在同一局域网）
 ```
+
+> **不在同一网络？** 可以使用 [Tailscale](https://tailscale.com) 在手机和电脑之间创建虚拟局域网，然后通过 Tailscale IP 访问服务器。
 
 ### 限制
 
