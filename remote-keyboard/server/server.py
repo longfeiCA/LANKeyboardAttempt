@@ -120,6 +120,8 @@ HTML_TEMPLATE = '''
             margin: 0;
             padding: 0;
             -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         body {
@@ -191,6 +193,8 @@ HTML_TEMPLATE = '''
             resize: none;
             height: 33vh;
             max-height: 200px;
+            -webkit-user-select: text;
+            user-select: text;
         }
 
         .button-row {
