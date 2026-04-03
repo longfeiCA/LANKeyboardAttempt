@@ -338,7 +338,7 @@ HTML_TEMPLATE = '''
             down: { en: 'Down', zh: '下' },
             placeholder: { en: 'Type here...', zh: '输入文字...' },
             title: { en: 'Remote Keyboard', zh: '远程键盘' },
-            footer: { en: 'On the Linux PC, the focused window will receive keys', zh: '在 Linux 电脑上打开此页面，当前焦点的窗口将接收按键' }
+            footer: { en: 'Open on phone, once connected you can control Linux input', zh: '在手机上打开此页面，如果显示已连接则可以控制Linux电脑输入' }
         };
 
         function updateStatusText() {
