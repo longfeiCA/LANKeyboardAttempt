@@ -199,6 +199,11 @@ HTML_TEMPLATE = '''
             background: #c73e54;
         }
 
+        .arrow-row {
+            display: flex;
+            gap: 8px;
+        }
+
         .keyboard {
             padding: 12px;
             display: flex;
@@ -236,6 +241,10 @@ HTML_TEMPLATE = '''
 
         .key.space {
             min-width: 180px;
+        }
+
+        .key.arrow {
+            background: #1a5276;
         }
 
         .key.enter {
@@ -285,6 +294,10 @@ HTML_TEMPLATE = '''
             <button class="key" data-key="backspace">⌫ 删除</button>
             <button class="key enter" data-key="enter">↵ 回车</button>
             <button class="send-btn" id="sendBtn">发送</button>
+        </div>
+        <div class="arrow-row">
+            <button class="key arrow" data-key="up">↑ 上</button>
+            <button class="key arrow" data-key="down">↓ 下</button>
         </div>
     </div>
 
