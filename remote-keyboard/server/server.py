@@ -281,102 +281,12 @@ HTML_TEMPLATE = '''
     </div>
 
     <div class="keyboard">
-        <!-- 功能键行 -->
-        <div class="row func-row">
-            <button class="key func" data-key="escape">Esc</button>
-            <button class="key func" data-key="f1">F1</button>
-            <button class="key func" data-key="f2">F2</button>
-            <button class="key func" data-key="f3">F3</button>
-            <button class="key func" data-key="f4">F4</button>
-            <button class="key func" data-key="f5">F5</button>
-            <button class="key func" data-key="f6">F6</button>
-            <button class="key func" data-key="f7">F7</button>
-            <button class="key func" data-key="f8">F8</button>
-            <button class="key func" data-key="f9">F9</button>
-            <button class="key func" data-key="f10">F10</button>
-            <button class="key func" data-key="f11">F11</button>
-            <button class="key func" data-key="f12">F12</button>
-        </div>
-
-        <!-- 第一行: 数字 -->
+        <!-- 简化键盘: 只保留删除、回车 -->
         <div class="row">
-            <button class="key" data-key="1">1</button>
-            <button class="key" data-key="2">2</button>
-            <button class="key" data-key="3">3</button>
-            <button class="key" data-key="4">4</button>
-            <button class="key" data-key="5">5</button>
-            <button class="key" data-key="6">6</button>
-            <button class="key" data-key="7">7</button>
-            <button class="key" data-key="8">8</button>
-            <button class="key" data-key="9">9</button>
-            <button class="key" data-key="0">0</button>
-            <button class="key wide" data-key="backspace">⌫</button>
-        </div>
-
-        <!-- 第二行: QWERTY -->
-        <div class="row">
-            <button class="key" data-key="q">Q</button>
-            <button class="key" data-key="w">W</button>
-            <button class="key" data-key="e">E</button>
-            <button class="key" data-key="r">R</button>
-            <button class="key" data-key="t">T</button>
-            <button class="key" data-key="y">Y</button>
-            <button class="key" data-key="u">U</button>
-            <button class="key" data-key="i">I</button>
-            <button class="key" data-key="o">O</button>
-            <button class="key" data-key="p">P</button>
-            <button class="key" data-key="bracket_left">[</button>
-            <button class="key" data-key="bracket_right">]</button>
-        </div>
-
-        <!-- 第三行: ASDF -->
-        <div class="row">
-            <button class="key" data-key="a">A</button>
-            <button class="key" data-key="s">S</button>
-            <button class="key" data-key="d">D</button>
-            <button class="key" data-key="f">F</button>
-            <button class="key" data-key="g">G</button>
-            <button class="key" data-key="h">H</button>
-            <button class="key" data-key="j">J</button>
-            <button class="key" data-key="k">K</button>
-            <button class="key" data-key="l">L</button>
-            <button class="key" data-key="semicolon">;</button>
-            <button class="key" data-key="quote">'</button>
-            <button class="key wide" data-key="enter">Enter</button>
-        </div>
-
-        <!-- 第四行: ZXCV -->
-        <div class="row">
-            <button class="key modifier" data-key="shift" data-modifier="shift">⇧</button>
-            <button class="key" data-key="z">Z</button>
-            <button class="key" data-key="x">X</button>
-            <button class="key" data-key="c">C</button>
-            <button class="key" data-key="v">V</button>
-            <button class="key" data-key="b">B</button>
-            <button class="key" data-key="n">N</button>
-            <button class="key" data-key="m">M</button>
-            <button class="key" data-key="comma">,</button>
-            <button class="key" data-key="period">.</button>
-            <button class="key" data-key="slash">/</button>
-            <button class="key modifier" data-key="ctrl" data-modifier="ctrl">Ctrl</button>
-        </div>
-
-        <!-- 第五行: 控制键 -->
-        <div class="row">
-            <button class="key modifier" data-key="alt" data-modifier="alt">Alt</button>
-            <button class="key modifier" data-key="super" data-modifier="super">⊞</button>
-            <button class="key space" data-key="space">空格</button>
-            <button class="key modifier" data-key="tab" data-modifier="tab">Tab</button>
-        </div>
-
-        <!-- 方向键 -->
-        <div class="row">
-            <button class="key" data-key="up">↑</button>
+            <button class="key wide" data-key="backspace">⌫ 删除</button>
         </div>
         <div class="row">
-            <button class="key" data-key="left">←</button>
-            <button class="key" data-key="down">↓</button>
-            <button class="key" data-key="right">→</button>
+            <button class="key wide" data-key="enter">↵ 回车</button>
         </div>
     </div>
 
@@ -385,9 +295,6 @@ HTML_TEMPLATE = '''
     </div>
 
     <script>
-        // 当前修饰键状态
-        let activeModifiers = new Set();
-
         // 检查连接状态
         async function checkStatus() {
             try {
@@ -410,12 +317,12 @@ HTML_TEMPLATE = '''
         }
 
         // 发送按键
-        async function sendKey(key, modifiers = []) {
+        async function sendKey(key) {
             try {
                 await fetch('/api/key', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({key, modifiers: modifiers.length ? modifiers : undefined})
+                    body: JSON.stringify({key})
                 });
             } catch (e) {
                 console.error('发送按键失败:', e);
@@ -435,32 +342,11 @@ HTML_TEMPLATE = '''
             }
         }
 
-        // 键盘按钮点击
+        // 按钮点击 - 只处理 backspace 和 enter
         document.querySelectorAll('.key').forEach(btn => {
             btn.addEventListener('click', () => {
                 const key = btn.dataset.key;
-                const modifier = btn.dataset.modifier;
-
-                if (modifier) {
-                    // 修饰键切换
-                    if (activeModifiers.has(modifier)) {
-                        activeModifiers.delete(modifier);
-                        btn.classList.remove('active');
-                    } else {
-                        activeModifiers.add(modifier);
-                        btn.classList.add('active');
-                    }
-                } else {
-                    // 普通按键
-                    const modifiers = Array.from(activeModifiers);
-                    sendKey(key, modifiers);
-
-                    // 清空修饰键状态
-                    activeModifiers.clear();
-                    document.querySelectorAll('.key.modifier.active').forEach(b => {
-                        b.classList.remove('active');
-                    });
-                }
+                sendKey(key);
             });
         });
 
