@@ -1,4 +1,4 @@
-# Remote Keyboard
+# Remote Controller
 
 <details open>
 <summary><b>🌐 Language / 语言</b></summary>
