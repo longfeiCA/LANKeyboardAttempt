@@ -5,9 +5,14 @@ xdotool 通过 X11 模拟按键，不需要 root 权限
 
 import logging
 import subprocess
+import os
+import time
 from typing import Optional
 
 logger = logging.getLogger(__name__)
+
+# 检测 Wayland
+IS_WAYLAND = bool(os.environ.get('WAYLAND_DISPLAY'))
 
 # xdotool key 名称映射
 KEY_MAP = {
@@ -34,7 +39,7 @@ KEY_MAP = {
     'alt': 'key Alt',
     'super': 'key Super',
     'meta': 'key Super',
-    # 符号 - xdotool 使用单字符
+    # 符号
     'comma': 'key comma',
     'period': 'key period',
     'slash': 'key slash',
@@ -62,26 +67,23 @@ MODIFIERS = ['ctrl', 'shift', 'alt', 'super']
 class KeyboardInjector:
     def __init__(self):
         self._initialized = True
+        self._wayland = IS_WAYLAND
 
     def initialize(self) -> bool:
         """xdotool 不需要初始化"""
-        logger.info("xdotool 键盘注入器就绪")
+        logger.info(f"xdotool 键盘注入器就绪 (Wayland={self._wayland})")
         return True
 
-    def _run_xdotool(self, args: list[str]) -> bool:
-        """运行 xdotool 命令"""
+    def _run(self, cmd: list[str], input_text: str = None) -> bool:
+        """运行命令"""
         try:
-            result = subprocess.run(
-                ['xdotool'] + args,
-                capture_output=True,
-                text=True,
-                timeout=2
-            )
-            if result.returncode != 0:
-                logger.warning(f"xdotool 警告: {result.stderr}")
+            kwargs = {'capture_output': True, 'text': True, 'timeout': 2}
+            if input_text:
+                kwargs['input'] = input_text
+            result = subprocess.run(cmd, **kwargs)
             return result.returncode == 0
         except Exception as e:
-            logger.error(f"xdotool 执行失败: {e}")
+            logger.error(f"命令执行失败: {e}")
             return False
 
     def send_key(self, key: str, modifiers: list[str] = None):
@@ -94,52 +96,82 @@ class KeyboardInjector:
         """
         modifiers = modifiers or []
 
-        # 构建命令
         args = []
 
         # 先添加修饰键 (keydown)
         for mod in modifiers:
             mod_lower = mod.lower()
             if mod_lower in MODIFIERS:
-                args.append('keydown')
-                args.append(mod_lower)
+                args.extend(['keydown', mod_lower])
 
         # 添加主键
         key_lower = key.lower()
         if key_lower in KEY_MAP:
-            # 提取 key 后面的部分
-            cmd = KEY_MAP[key_lower]
-            _, keyname = cmd.split()
-            args.append('key')
-            args.append(keyname)
+            _, keyname = KEY_MAP[key_lower].split()
+            args.extend(['key', keyname])
         else:
-            # 尝试直接发送
-            args.append('key')
-            args.append(key_lower)
+            args.extend(['key', key_lower])
 
         # 添加修饰键 keyup
         for mod in reversed(modifiers):
             mod_lower = mod.lower()
             if mod_lower in MODIFIERS:
-                args.append('keyup')
-                args.append(mod_lower)
+                args.extend(['keyup', mod_lower])
 
-        self._run_xdotool(args)
+        self._run(['xdotool'] + args)
         logger.info(f"发送按键: key={key}, modifiers={modifiers}")
 
     def send_text(self, text: str):
         """
-        发送一串文本
-
-        Args:
-            text: 要发送的文本
+        发送文本
+        - 纯ASCII: xdotool type
+        - 含中文: 剪贴板 + Ctrl+V
         """
-        # xdotool type 直接输入文本
-        self._run_xdotool(['type', '--', text])
-        logger.info(f"发送文本: {text[:50]}...")
+        has_cjk = any(ord(c) > 127 for c in text)
+
+        if has_cjk:
+            # 中文: 复制到剪贴板，然后粘贴
+            self._copy_to_clipboard(text)
+            import time; time.sleep(0.2)  # 等待剪贴板同步
+            self._run(['xdotool', 'key', 'ctrl+v'])
+            logger.info(f"发送中文(剪贴板): {text[:30]}...")
+        else:
+            self._run(['xdotool', 'type', '--', text])
+            logger.info(f"发送文本: {text[:30]}...")
+
+    def _copy_to_clipboard(self, text: str):
+        """复制到剪贴板"""
+        # 尝试 Wayland
+        if self._run(['wl-copy'], input_text=text):
+            return
+
+        # 尝试 xclip
+        try:
+            result = subprocess.run(
+                ['xclip', '-selection', 'clipboard', '-i'],
+                input=text.encode('utf-8'),
+                capture_output=True, timeout=2
+            )
+            if result.returncode == 0:
+                return
+        except FileNotFoundError:
+            pass
+
+        # 尝试 xsel
+        try:
+            result = subprocess.run(
+                ['xsel', '--clipboard', '--input'],
+                input=text.encode('utf-8'),
+                capture_output=True, timeout=2
+            )
+            if result.returncode == 0:
+                return
+        except FileNotFoundError:
+            pass
+
+        logger.warning("未找到剪贴板工具 wl-copy/xclip/xsel")
 
     def cleanup(self):
-        """清理（xdotool 不需要）"""
         pass
 
 
