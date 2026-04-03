@@ -113,7 +113,7 @@ HTML_TEMPLATE = '''
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>远程键盘</title>
+    <title>Remote Keyboard</title>
     <style>
         * {
             box-sizing: border-box;
@@ -295,7 +295,7 @@ HTML_TEMPLATE = '''
 </head>
 <body>
     <div class="header">
-        <span style="font-weight: bold;">远程键盘</span>
+        <span style="font-weight: bold;" id="appTitle">远程键盘</span>
         <div class="status">
             <button class="lang-toggle" id="langBtn">EN</button>
             <div class="status-dot" id="statusDot"></div>
@@ -323,6 +323,7 @@ HTML_TEMPLATE = '''
     <script>
         // 语言切换
         let currentLang = localStorage.getItem('lang') || 'en';
+        let isConnected = false;
 
         const langLabels = {
             en: 'EN',
@@ -336,11 +337,23 @@ HTML_TEMPLATE = '''
             up: { en: 'Up', zh: '上' },
             down: { en: 'Down', zh: '下' },
             placeholder: { en: 'Type here...', zh: '输入文字...' },
+            title: { en: 'Remote Keyboard', zh: '远程键盘' },
             footer: { en: 'On the Linux PC, the focused window will receive keys', zh: '在 Linux 电脑上打开此页面，当前焦点的窗口将接收按键' }
         };
 
+        function updateStatusText() {
+            const text = document.getElementById('statusText');
+            if (!isConnected) {
+                text.textContent = currentLang === 'en' ? 'Disconnected' : '未连接';
+            } else {
+                text.textContent = currentLang === 'en' ? 'Connected' : '已连接';
+            }
+        }
+
         function updateLang() {
             document.getElementById('langBtn').textContent = langLabels[currentLang];
+            document.getElementById('appTitle').textContent = buttonLabels.title[currentLang];
+            updateStatusText();
             document.getElementById('backspaceLabel').textContent = buttonLabels.backspace[currentLang];
             document.getElementById('enterLabel').textContent = buttonLabels.enter[currentLang];
             document.getElementById('sendBtn').textContent = buttonLabels.send[currentLang];
@@ -362,19 +375,19 @@ HTML_TEMPLATE = '''
                 const res = await fetch('/api/status');
                 const data = await res.json();
                 const dot = document.getElementById('statusDot');
-                const text = document.getElementById('statusText');
 
                 if (data.status === 'ok') {
                     dot.classList.add('connected');
-                    text.textContent = currentLang === 'en' ? 'Connected' : '已连接';
+                    isConnected = true;
                 } else {
                     dot.classList.remove('connected');
-                    text.textContent = currentLang === 'en' ? (data.message || 'Disconnected') : (data.message || '未连接');
+                    isConnected = false;
                 }
             } catch (e) {
                 document.getElementById('statusDot').classList.remove('connected');
-                document.getElementById('statusText').textContent = currentLang === 'en' ? 'Disconnected' : '未连接';
+                isConnected = false;
             }
+            updateStatusText();
         }
 
         // 发送按键
