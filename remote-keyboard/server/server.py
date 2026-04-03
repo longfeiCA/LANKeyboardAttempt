@@ -164,12 +164,10 @@ HTML_TEMPLATE = '''
             display: flex;
             flex-direction: column;
             gap: 8px;
-            flex: 1;
-            min-height: 120px;
+            flex: 0 1 auto;
         }
 
         #textInput {
-            flex: 1;
             padding: 12px;
             border: 1px solid #0f3460;
             border-radius: 8px;
@@ -177,7 +175,8 @@ HTML_TEMPLATE = '''
             color: #eee;
             font-size: 16px;
             resize: none;
-            min-height: 40px;
+            height: 33vh;
+            max-height: 200px;
         }
 
         .button-row {
@@ -239,6 +238,10 @@ HTML_TEMPLATE = '''
             min-width: 180px;
         }
 
+        .key.enter {
+            background: #22c55e;
+        }
+
         .key.modifier {
             background: #0f3460;
             font-size: 12px;
@@ -280,7 +283,7 @@ HTML_TEMPLATE = '''
         <textarea id="textInput" placeholder="输入文字..."></textarea>
         <div class="button-row">
             <button class="key" data-key="backspace">⌫ 删除</button>
-            <button class="key" data-key="enter">↵ 回车</button>
+            <button class="key enter" data-key="enter">↵ 回车</button>
             <button class="send-btn" id="sendBtn">发送</button>
         </div>
     </div>
