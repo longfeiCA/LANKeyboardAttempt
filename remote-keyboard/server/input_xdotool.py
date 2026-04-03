@@ -133,7 +133,9 @@ class KeyboardInjector:
             # 中文: 复制到剪贴板，然后粘贴
             self._copy_to_clipboard(text)
             import time; time.sleep(0.2)  # 等待剪贴板同步
-            self._run(['xdotool', 'key', 'ctrl+v'])
+            # 尝试 Ctrl+Shift+V (终端/命令行)，不行再用 Ctrl+V
+            if not self._run(['xdotool', 'key', 'ctrl+shift+v']):
+                self._run(['xdotool', 'key', 'ctrl+v'])
             logger.info(f"发送中文(剪贴板): {text[:30]}...")
         else:
             self._run(['xdotool', 'type', '--', text])
