@@ -158,6 +158,20 @@ HTML_TEMPLATE = '''
             background: #4ade80;
         }
 
+        .lang-toggle {
+            padding: 4px 10px;
+            border: 1px solid #0f3460;
+            border-radius: 4px;
+            background: #0f3460;
+            color: #eee;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .lang-toggle:active {
+            background: #e94560;
+        }
+
         .text-input-area {
             padding: 12px;
             background: #16213e;
@@ -283,29 +297,65 @@ HTML_TEMPLATE = '''
     <div class="header">
         <span style="font-weight: bold;">远程键盘</span>
         <div class="status">
+            <button class="lang-toggle" id="langBtn">EN</button>
             <div class="status-dot" id="statusDot"></div>
             <span id="statusText">连接中...</span>
         </div>
     </div>
 
     <div class="text-input-area">
-        <textarea id="textInput" placeholder="输入文字..."></textarea>
+        <textarea id="textInput" placeholder="Type here..."></textarea>
         <div class="button-row">
-            <button class="key" data-key="backspace">⌫ 删除</button>
-            <button class="key enter" data-key="enter">↵ 回车</button>
-            <button class="send-btn" id="sendBtn">发送</button>
+            <button class="key" data-key="backspace">⌫ <span id="backspaceLabel">DEL</span></button>
+            <button class="key enter" data-key="enter">↵ <span id="enterLabel">ENTER</span></button>
+            <button class="send-btn" id="sendBtn">SEND</button>
         </div>
         <div class="arrow-row">
-            <button class="key arrow" data-key="up">↑ 上</button>
-            <button class="key arrow" data-key="down">↓ 下</button>
+            <button class="key arrow" data-key="up">↑ <span id="upLabel">UP</span></button>
+            <button class="key arrow" data-key="down">↓ <span id="downLabel">DOWN</span></button>
         </div>
     </div>
 
     <div class="footer">
-        在 Linux 电脑上打开此页面，当前焦点的窗口将接收按键
+        On the Linux PC, the focused window will receive keys
     </div>
 
     <script>
+        // 语言切换
+        let currentLang = localStorage.getItem('lang') || 'en';
+
+        const langLabels = {
+            en: 'EN',
+            zh: '中文'
+        };
+
+        const buttonLabels = {
+            backspace: { en: 'Del', zh: '删除' },
+            enter: { en: 'Enter', zh: '回车' },
+            send: { en: 'Send', zh: '发送' },
+            up: { en: 'Up', zh: '上' },
+            down: { en: 'Down', zh: '下' },
+            placeholder: { en: 'Type here...', zh: '输入文字...' },
+            footer: { en: 'On the Linux PC, the focused window will receive keys', zh: '在 Linux 电脑上打开此页面，当前焦点的窗口将接收按键' }
+        };
+
+        function updateLang() {
+            document.getElementById('langBtn').textContent = langLabels[currentLang];
+            document.getElementById('backspaceLabel').textContent = buttonLabels.backspace[currentLang];
+            document.getElementById('enterLabel').textContent = buttonLabels.enter[currentLang];
+            document.getElementById('sendBtn').textContent = buttonLabels.send[currentLang];
+            document.getElementById('upLabel').textContent = buttonLabels.up[currentLang];
+            document.getElementById('downLabel').textContent = buttonLabels.down[currentLang];
+            document.getElementById('textInput').placeholder = buttonLabels.placeholder[currentLang];
+            document.querySelector('.footer').textContent = buttonLabels.footer[currentLang];
+            localStorage.setItem('lang', currentLang);
+        }
+
+        document.getElementById('langBtn').addEventListener('click', () => {
+            currentLang = currentLang === 'en' ? 'zh' : 'en';
+            updateLang();
+        });
+
         // 检查连接状态
         async function checkStatus() {
             try {
@@ -316,14 +366,14 @@ HTML_TEMPLATE = '''
 
                 if (data.status === 'ok') {
                     dot.classList.add('connected');
-                    text.textContent = '已连接';
+                    text.textContent = currentLang === 'en' ? 'Connected' : '已连接';
                 } else {
                     dot.classList.remove('connected');
-                    text.textContent = data.message || '未连接';
+                    text.textContent = currentLang === 'en' ? (data.message || 'Disconnected') : (data.message || '未连接');
                 }
             } catch (e) {
                 document.getElementById('statusDot').classList.remove('connected');
-                document.getElementById('statusText').textContent = '未连接';
+                document.getElementById('statusText').textContent = currentLang === 'en' ? 'Disconnected' : '未连接';
             }
         }
 
@@ -378,6 +428,8 @@ HTML_TEMPLATE = '''
                 document.getElementById('sendBtn').click();
             }
         });
+
+        updateLang();
 
         // 定期检查状态
         checkStatus();
